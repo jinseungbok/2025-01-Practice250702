@@ -1,0 +1,67 @@
+<script setup>
+import HttpService from "../../services/HttpService";
+import { onMounted, reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+const router = useRouter();
+
+const state = reactive({
+  memo: {
+    id: 0,
+    title: "",
+    content: "",
+    createdAt: "",
+  },
+});
+
+onMounted(() => {
+  const passData = history.state.data;
+  console.log("passData:", passData);
+  if (passData) {
+    // 넘어온 데이터가 있다면
+    state.memo = JSON.parse(passData);
+  }
+});
+
+const procSubmit = async () => {
+  const jsonBody = {
+    title: state.memo.title,
+    content: state.memo.content,
+  };
+  const data = await HttpService.save(jsonBody);
+  if (data.resultData === 1) {
+    // 주소가 "/"으로 이동(라우팅 처리)
+    router.push({ path: "/" });
+  } else {
+    alert(data.resultMessage);
+  }
+};
+</script>
+
+<template>
+  <form class="detail" @submit.prevent="procSubmit">
+    <div class="mb-3" v-if="state.memo.createdAt">
+      등록일시: {{ state.memo.createdAt }}
+    </div>
+    <div class="mb-3">
+      <label for="title" class="form-label">제목</label>
+      <input
+        type="text"
+        id="title"
+        class="form-control p-3"
+        v-model="state.memo.title"
+      />
+    </div>
+    <div class="mb-3">
+      <label for="content" class="form-label">내용</label>
+      <textarea
+        id="content"
+        class="form-control p-3"
+        v-model="state.memo.content"
+      ></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-3">저장</button>
+  </form>
+</template>
+
+<style scoped></style>
