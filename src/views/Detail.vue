@@ -3,6 +3,7 @@ import HttpService from "../../services/HttpService";
 import { reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
@@ -20,31 +21,30 @@ onMounted(async () => {
   state.memo = data.resultData;
 });
 
+onMounted(async () => {
+  const id = route.params.id;
+  const data = await HttpService.findById(id);
+  state.memo = data.resultData;
+});
+
 const moveToForm = () => {
-
-  const json = JSON.stringify(state.memo);
-
+  const json = JSON.stringify(state.memo); // Object to JSON
   router.push({
-    path: '/memo/add',
+    path: "/memo/add",
     state: {
-      data: json
-  })
-}
+      data: json,
+    },
+  });
+};
 </script>
 
 <template>
   <div class="mb-3">등록일시: {{ state.memo.createdAt }}</div>
   <div class="mb-3">제목: {{ state.memo.title }}</div>
   <div class="mb-3">내용: {{ state.memo.content }}</div>
-  <router-link :to="`/memo/${state.memo.id}`">
-    <button
-      type="button"
-      class="btn btn-primary w-100 py-3"
-      @click="moveToForm"
-    >
-      수정
-    </button>
-  </router-link>
+  <button type="button" class="btn btn-primary w-100 py-3" @click="moveToForm">
+    수정
+  </button>
 </template>
 
 <style scoped></style>

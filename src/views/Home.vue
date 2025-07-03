@@ -12,6 +12,7 @@ onMounted(() => {
 });
 
 const findAll = async (params) => {
+  console.log('params:', params);
   const data = await HttpService.findAll(params);
   // 구현
   state.memos = data.resultData;
@@ -25,6 +26,14 @@ const search = () => {
   const params = { search_text: model.searchText };
   findAll(params);
 };
+const remove = async id => {
+  if(!confirm('삭제하시겠습니까?')) { return; }
+
+  const data = await HttpService.deleteById(id);
+  if(data.resultData === 1) {
+    search();
+  }
+}
 </script>
 
 <template>
